@@ -38,7 +38,7 @@ To enable `Microsoft.Extensions.Logging` adapters, define the `MYSQL_MEL_LOGGING
 ## Quick Start
 
 ```csharp
-var options = new MySqlConnectionOptions
+MySqlConnectionOptions options = new MySqlConnectionOptions
 {
     Server   = "localhost",
     Database = "mydb",
@@ -46,7 +46,7 @@ var options = new MySqlConnectionOptions
     Password = "secret"
 };
 
-var db = new MySqlDatabase(options, ConsoleDbLogger.Instance);
+MySqlDatabase db = new MySqlDatabase(options, ConsoleDbLogger.Instance);
 
 // Execute a non-query
 await db.ExecuteAsync("UPDATE users SET active = 1 WHERE id = @id",
@@ -75,15 +75,15 @@ long count = await db.ScalarAsync<long>("SELECT COUNT(*) FROM users") ?? 0;
 
 ```csharp
 // No logging (default)
-var db = new MySqlDatabase(connectionString);
+MySqlDatabase db = new MySqlDatabase(connectionString);
 
 // Console logging
-var db = new MySqlDatabase(connectionString, ConsoleDbLogger.Instance);
+MySqlDatabase db = new MySqlDatabase(connectionString, ConsoleDbLogger.Instance);
 ConsoleDbLogger.Instance.MinLevel = DbLogLevel.Debug; // optional
 
 // Microsoft.Extensions.Logging (requires MYSQL_MEL_LOGGING)
 ILogger<MyService> msLogger = ...; // injected
-var db = new MySqlDatabase(connectionString, new MicrosoftLoggerAdapter<MyService>(msLogger));
+MySqlDatabase db = new MySqlDatabase(connectionString, new MicrosoftLoggerAdapter<MyService>(msLogger));
 
 // Custom logger
 public class MyLogger : IDbLogger
@@ -185,7 +185,7 @@ catch
 ## Bulk Inserts
 
 ```csharp
-var rows = items.Select(i => new Dictionary<string, object?>
+List<Dictionary<string, object?>> rows = items.Select(i => new Dictionary<string, object?>
 {
     ["sku"]      = i.Sku,
     ["quantity"] = i.Quantity,
