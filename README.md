@@ -49,21 +49,16 @@ MySqlConnectionOptions options = new MySqlConnectionOptions
 MySqlDatabase db = new MySqlDatabase(options, ConsoleDbLogger.Instance);
 
 // Execute a non-query
-await db.ExecuteAsync("UPDATE users SET active = 1 WHERE id = @id",
-    Params.Of(("id", 42)));
+await db.ExecuteAsync("UPDATE users SET active = 1 WHERE id = @id",Params.Of(("id", 42)));
 
 // Query multiple rows
-List<DbRow> rows = await db.QueryAsync(
-    "SELECT * FROM users WHERE role = @role",
-    Params.Of(("role", "admin")));
+List<DbRow> rows = await db.QueryAsync("SELECT * FROM users WHERE role = @role", Params.Of(("role", "admin")));
 
 foreach (DbRow row in rows)
     Console.WriteLine($"{row.GetString("username")} — {row.GetString("email")}");
 
 // Query a single row
-DbRow? user = await db.QuerySingleAsync(
-    "SELECT * FROM users WHERE id = @id",
-    Params.Of(("id", 1)));
+DbRow? user = await db.QuerySingleAsync("SELECT * FROM users WHERE id = @id", Params.Of(("id", 1)));
 
 // Scalar value
 long count = await db.ScalarAsync<long>("SELECT COUNT(*) FROM users") ?? 0;
@@ -88,8 +83,7 @@ MySqlDatabase db = new MySqlDatabase(connectionString, new MicrosoftLoggerAdapte
 // Custom logger
 public class MyLogger : IDbLogger
 {
-    public void Log(DbLogLevel level, string message, Exception? ex = null)
-        => MyLoggingSystem.Write(level.ToString(), message, ex);
+    public void Log(DbLogLevel level, string message, Exception? ex = null) => MyLoggingSystem.Write(level.ToString(), message, ex);
 }
 ```
 
@@ -154,13 +148,11 @@ await db.DeleteAsync("sessions", "expires_at < @now", Params.Of(("now", DateTime
 // Callback style — commit and rollback handled automatically
 await db.TransactAsync(async tx =>
 {
-    await tx.ExecuteAsync("INSERT INTO orders (user_id, total) VALUES (@uid, @total)",
-        Params.Of(("uid", 5), ("total", 299.99m)));
+    await tx.ExecuteAsync("INSERT INTO orders (user_id, total) VALUES (@uid, @total)", Params.Of(("uid", 5), ("total", 299.99m)));
 
     long orderId = await tx.ScalarAsync<long>("SELECT LAST_INSERT_ID()") ?? 0;
 
-    await tx.ExecuteAsync("INSERT INTO order_items (order_id, sku) VALUES (@oid, @sku)",
-        Params.Of(("oid", orderId), ("sku", "WIDGET-1")));
+    await tx.ExecuteAsync("INSERT INTO order_items (order_id, sku) VALUES (@oid, @sku)", Params.Of(("oid", orderId), ("sku", "WIDGET-1")));
 });
 
 // Manual style with savepoints
@@ -235,9 +227,7 @@ await db.EnsureIndexAsync("players", "idx_created", ["created_at"]);
 ## Streaming Large Result Sets
 
 ```csharp
-await foreach (DbRow row in db.QueryStreamAsync(
-    "SELECT * FROM event_log WHERE created_at > @since",
-    Params.Of(("since", DateTime.UtcNow.AddDays(-7)))))
+await foreach (DbRow row in db.QueryStreamAsync("SELECT * FROM event_log WHERE created_at > @since", Params.Of(("since", DateTime.UtcNow.AddDays(-7)))))
 {
     ProcessEvent(row);
 }
